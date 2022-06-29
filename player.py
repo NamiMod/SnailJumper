@@ -3,6 +3,7 @@ import random
 import pygame
 from variables import global_variables
 from nn import NeuralNetwork
+import numpy as np
 
 
 class Player(pygame.sprite.Sprite):
@@ -35,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         if self.game_mode == "Neuroevolution":
             self.fitness = 0  # Initial fitness
 
-            layer_sizes = [3, 10, 2]  # TODO (Design your architecture here by changing the values)
+            layer_sizes = [4, 10, 2]  # TODO (Design your architecture here by changing the values)
             self.nn = NeuralNetwork(layer_sizes)
 
     def think(self, screen_width, screen_height, obstacles, player_x, player_y):
@@ -53,11 +54,29 @@ class Player(pygame.sprite.Sprite):
         """
         # TODO (change player's gravity here by calling self.change_gravity)
 
-        # This is a test code that changes the gravity based on a random number. Remove it before your implementation.
-        if random.randint(0, 2):
-            self.change_gravity('left')
-        else:
+        temp = self.nn.forward(self.calculate_current_neuron(player_x, player_y, obstacles, screen_width, screen_height))[0][0]
+        if temp > 0.5:
             self.change_gravity('right')
+        else: 
+            self.change_gravity('left')
+
+    def calculate_current_neuron(self, player_x, player_y, obstacles, screen_width, screen_height):
+        current_neuron = np.zeros((4, 1))
+        
+        current_neuron[0] = 1
+        current_neuron[1] = 0
+        if (len(obstacles) > 0):
+            current_neuron[0] = (obstacles[0]['x'] - player_x) / screen_width
+            current_neuron[1] = (player_y - obstacles[0]['y']) / screen_height
+
+        current_neuron[2] = 1
+        current_neuron[3] = 0
+        if (len(obstacles) > 1):
+            current_neuron[2] = (obstacles[1]['x'] - player_x) / screen_width
+            current_neuron[3] = (player_y - obstacles[1]['y']) / screen_height
+
+        return current_neuron
+
 
     def change_gravity(self, new_gravity):
         """
