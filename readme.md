@@ -1,6 +1,6 @@
 # Snail jumper
 
-(SnailJumper.png)
+![Snail Jumber](SnailJumper.png)
 
 The game is so simple! a runner agent needs to jump over obstacles to survive. 
 This game has two modes: 
